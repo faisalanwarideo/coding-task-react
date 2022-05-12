@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
-import { useGetDonations, useGetLocations, useGetThemes } from '../hooks/getDonations';
+import { useGetDonations, useGetLocations, useGetThemes } from '../hooks/getData';
 import { useNavigate } from 'react-router-dom';
 import { DonationProp } from './Donations';
 
@@ -12,14 +12,15 @@ interface DonationBody {
 }
 
 export default function CreateDonation() {
-  const names = useGetDonations().map((donation) => donation.name)
+  const names = useGetDonations().donations.map((donation) => donation.name)
   const locations = useGetLocations()
   const themes = useGetThemes()
   const [name, setName] = useState('')
-  const [location, setLocation] = useState('')
-  const [theme, setTheme] = useState('')
+  const [location, setLocation] = useState('default')
+  const [theme, setTheme] = useState('default')
   const [error, setError] = useState('')
   const [price, setPrice] = useState(1)
+  const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
 
   const submitForm = (e: React.SyntheticEvent) => {
@@ -59,13 +60,15 @@ export default function CreateDonation() {
         currencyCode: 'GBP'
       }
     }
+    setSubmitting(true)
     axios.post(`https://n3o-coding-task-react.azurewebsites.net/api/v1/donationItems`, body).then((response) => {
       if (response.status === 200) {
         navigate('/')
       }
-
+      setSubmitting(false)
     }).catch(err => {
       setError(err.message)
+      setSubmitting(false)
     })
 
   }
@@ -78,7 +81,7 @@ export default function CreateDonation() {
           <small id="emailHelp" className="form-text text-muted">Name should be unique and between 1 and 200 characters</small>
         </div>
         <div className='form-group'>
-          <select defaultValue={'default'} className='form-select mt-2' onChange={(e) => setLocation(e.target.value)}>
+          <select value={location} className='form-select mt-2' onChange={(e) => setLocation(e.target.value)}>
             <option value={'default'} disabled>Select Location</option>
             {locations.map((location: DonationProp) => {
               return (
@@ -88,7 +91,7 @@ export default function CreateDonation() {
           </select>
         </div>
         <div className='form-group'>
-          <select defaultValue={'default'} className='form-select mt-2' onChange={(e) => setTheme(e.target.value)}>
+          <select value={theme} className='form-select mt-2' onChange={(e) => setTheme(e.target.value)}>
             <option value={'default'} disabled>Select Theme</option>
             {themes.map((theme: DonationProp) => {
               return (
@@ -105,7 +108,7 @@ export default function CreateDonation() {
         </div>
 
 
-        <button type='submit' className='btn btn-primary mt-2'>Submit</button>
+        <button type='submit' className='btn btn-primary mt-2'>{submitting ? <div className="spinner-border-sm"></div> : 'Submit'}</button>
         <span className='text-danger'>{error}</span>
       </form>
     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useGetDonations, useGetStatuses } from '../hooks/getDonations'
+import { useGetDonations, useGetStatuses } from '../hooks/getData'
 import { useNavigate } from 'react-router-dom';
 
 export interface DonationProp {
@@ -32,7 +32,7 @@ export interface Donation {
 }
 
 export default function Donations() {
-    const donations: Donation[] = useGetDonations()
+    const { donations, loading } = useGetDonations()
     const [filteredDonations, setFilteredDonations] = useState(donations)
     const [status, setStatus] = useState('All')
     const statuses = useGetStatuses()
@@ -69,20 +69,27 @@ export default function Donations() {
                     <span className='p-2 col-2'>Location</span>
                     <span className='p-2 col-2'>Theme</span>
                 </li>
-                {filteredDonations.length ?
-                    filteredDonations.map((donation: Donation, index) => {
-                        return (
-                            <li key={index} className='d-flex flex-row justify-content-between list-group-item'>
-                                <span className='p-2 col-2'>{donation.name}</span>
-                                <span className='p-2 col-2'>{donation.reference.text}</span>
-                                <span className='p-2 col-2'>{donation.price && donation.price.text}</span>
-                                <span className='p-2 col-2'>{donation.status.name}</span>
-                                <span className='p-2 col-2'>{donation.location.name}</span>
-                                <span className='p-2 col-2'>{donation.theme.name}</span>
-                            </li>
-                        )
-                    }) :
-                    <li className='list-group-item'>No donations to show</li>
+                {loading ? <li className="d-flex flex-row justify-content-center list-group-item p-'">
+                    <div className="spinner-border spinner-border-sm"></div>
+                </li> :
+                    filteredDonations.length ?
+                        filteredDonations.map((donation: Donation, index) => {
+                            return (
+                                <li key={index} className='d-flex flex-row justify-content-between list-group-item'>
+                                    <span className='p-2 col-2'>{donation.name}</span>
+                                    <span className='p-2 col-2'>{donation.reference.text}</span>
+                                    <span className='p-2 col-2'>{donation.price && donation.price.text}</span>
+                                    <span 
+                                    className={`p-2 col-2 
+                                    ${donation.status.name === 'Active' ? 'text-success' : ''} 
+                                    ${donation.status.name === 'Inactive' ? 'text-danger' : ''}
+                                    ${donation.status.name === 'Awaiting Approval' ? 'text-warning' : ''}`}>{donation.status.name}</span>
+                                    <span className='p-2 col-2'>{donation.location.name}</span>
+                                    <span className='p-2 col-2'>{donation.theme.name}</span>
+                                </li>
+                            )
+                        }) :
+                        <li className='list-group-item'>No donations to show</li>
                 }
             </ul>
 

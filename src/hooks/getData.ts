@@ -2,22 +2,28 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Donation, DonationProp } from '../components/Donations'
 
+const BASE_URL = 'https://n3o-coding-task-react.azurewebsites.net/'
+
 export const useGetDonations = () => {
   const [donations, setDonations] = useState<Donation[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function getDonations() {
       try {
-        const { data } = await axios.get(`https://n3o-coding-task-react.azurewebsites.net/api/v1/donationItems/all`)
+        setLoading(true)
+        const { data } = await axios.get(`${BASE_URL}api/v1/donationItems/all`)
+        setLoading(false)
         setDonations(data)
       } catch (error) {
+        setLoading(false)
         console.log((error as Error).message)
       }
     }
     getDonations()
   }, [])
 
-  return donations
+  return { donations, loading }
 }
 
 export const useGetLocations = () => {
@@ -26,7 +32,7 @@ export const useGetLocations = () => {
   useEffect(() => {
     async function getLocations() {
       try {
-        const { data } = await axios.get(`https://n3o-coding-task-react.azurewebsites.net/api/v1/donationItems/locations`)
+        const { data } = await axios.get(`${BASE_URL}api/v1/donationItems/locations`)
         setLocations(data)
       } catch (error) {
         console.log((error as Error).message)
@@ -44,7 +50,7 @@ export const useGetThemes = () => {
   useEffect(() => {
     async function getThemes() {
       try {
-        const { data } = await axios.get(`https://n3o-coding-task-react.azurewebsites.net/api/v1/donationItems/themes`)
+        const { data } = await axios.get(`${BASE_URL}api/v1/donationItems/themes`)
         setThemes(data)
       } catch (error) {
         console.log((error as Error).message)
@@ -62,7 +68,7 @@ export const useGetStatuses = () => {
   useEffect(() => {
     async function getStatuses() {
       try {
-        const { data } = await axios.get(`https://n3o-coding-task-react.azurewebsites.net/api/v1/donationItems/statuses`)
+        const { data } = await axios.get(`${BASE_URL}api/v1/donationItems/statuses`)
         setStatuses(data)
       } catch (error) {
         console.log((error as Error).message)
