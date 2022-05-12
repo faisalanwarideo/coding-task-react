@@ -22,10 +22,10 @@ export default function CreateDonation() {
   const [price, setPrice] = useState(1)
   const navigate = useNavigate()
 
-  const submitForm = (e: React.SyntheticEvent ) => {
+  const submitForm = (e: React.SyntheticEvent) => {
     e.preventDefault()
     setError('')
-    if (!name) {
+    if (!name.trim()) {
       setError('Name is Required')
       return
     } else if (name.length < 1 || name.length > 200) {
@@ -65,7 +65,7 @@ export default function CreateDonation() {
       }
 
     }).catch(err => {
-      console.log(err)
+      setError(err.message)
     })
 
   }
